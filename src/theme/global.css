@@ -1,0 +1,119 @@
+ion-content {
+  --background: var(--ion-background-color);
+}
+
+/* Generic card / item styling */
+ion-card,
+ion-item {
+  border-radius: var(--app-card-radius);
+  background: var(--app-card-background);
+  box-shadow: var(--app-card-shadow);
+  border: 1px solid var(--app-card-border);
+}
+
+/* Buttons */
+ion-button {
+  border-radius: 14px;
+  font-weight: 600;
+}
+
+/* Utility to keep tap targets at recommended 44–48px size */
+.tap-target {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Inputs / textareas */
+ion-input,
+ion-textarea {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(148,163,184,0.3);
+  background: #ffffff;
+}
+
+/* Fancy gradient page header */
+.page-header {
+  background: linear-gradient(
+    135deg,
+    #A86FFF 0%,
+    #FF6FD8 40%,
+    #5ED5E5 100%
+  );
+  color: white;
+  padding: 24px 20px;
+  border-radius: 0 0 24px 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.page-header p {
+  margin: 6px 0 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Day Log Modal layout */
+
+.day-modal-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Text at the top of the modal */
+.day-modal-summary {
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0 0 12px;
+  color: rgba(15, 23, 42, 0.85); /* slate-ish */
+}
+
+.day-modal-summary strong {
+  font-weight: 600;
+}
+
+/* Empty-state container */
+.day-modal-empty {
+  text-align: left;
+  font-size: 14px;
+  color: rgba(15, 23, 42, 0.8);
+}
+
+.day-modal-empty p {
+  margin: 0 0 12px;
+}
+
+/* List area inside the modal */
+.day-modal-list {
+  margin-top: 12px;
+  padding-bottom: 8px;
+}
+
+/* Footer actions in the modal */
+.day-modal-actions {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@keyframes calendarFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

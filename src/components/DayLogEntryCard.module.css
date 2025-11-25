@@ -1,0 +1,80 @@
+.entryCard {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  padding: 12px;
+  background-color: #ffffff;
+}
+
+/* Header: entry label + title + phase + delete button */
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.entryIndex {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-bottom: 2px;
+}
+
+.entryTitle {
+  margin: 0;
+}
+
+.entryPhase {
+  font-size: 12px;
+  opacity: 0.8;
+  margin: 0;
+}
+
+/* Phase chips row */
+.phasePills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 8px;
+}
+
+/* Metrics row: energy / RPE / sleep */
+.metricsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.metricCol {
+  flex: 1;
+  min-width: 90px;
+}
+
+/* Small helper text */
+.helperText {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+.phaseTagMenstrual {
+  color: var(--phase-menstrual);
+}
+
+.phaseTagFollicular {
+  color: var(--phase-follicular);
+}
+
+.phaseTagOvulatory {
+  color: var(--phase-ovulatory);
+}
+
+.phaseTagLuteal {
+  color: var(--phase-luteal);
+}
+
+.phaseTagCustom {
+  color: var(--phase-custom);
+}
