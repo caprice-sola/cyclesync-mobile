@@ -48,7 +48,7 @@ export const MetricsChart: React.FC<MetricsChartProps> = ({ data }) => {
       <ResponsiveContainer>
         <LineChart
           data={data}
-          margin={{ top: 10, right: 16, bottom: 20, left: 0 }}
+          margin={{ top: 8, right: 12, bottom: 18, left: 0 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis

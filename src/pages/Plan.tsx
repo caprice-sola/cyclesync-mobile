@@ -214,7 +214,11 @@ const Plan: React.FC = () => {
         </IonItem>
 
         {currentWeek.days.map((day, index) => (
-          <IonItem key={DAYS[index]} lines="full">
+          <IonItem
+            key={DAYS[index]}
+            lines="full"
+            style={{ paddingTop: 10, paddingBottom: 10 }}
+          >
             <div style={{ width: "100%" }}>
               <IonLabel position="stacked">{DAYS[index]}</IonLabel>
               <IonInput

@@ -1,0 +1,23 @@
+/* Give the chart card breathing room */
+.metrics-card-content {
+  padding: 0 8px 12px;
+}
+
+.metrics-chart-shell {
+  padding: 10px 6px 10px;
+  min-height: 340px;
+}
+
+@media (min-width: 430px) {
+  .metrics-chart-shell {
+    min-height: 360px;
+    padding: 12px 8px 12px;
+  }
+}
+
+@media (min-width: 600px) {
+  .metrics-chart-shell {
+    min-height: 400px;
+    padding: 14px 10px 14px;
+  }
+}

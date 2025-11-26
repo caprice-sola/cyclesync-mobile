@@ -1,0 +1,64 @@
+.log-calendar {
+  margin-bottom: 16px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.log-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: linear-gradient(
+    120deg,
+    rgba(168, 111, 255, 0.14),
+    rgba(94, 213, 229, 0.14)
+  );
+  gap: 8px;
+}
+
+.log-calendar-month {
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  color: #0f172a;
+}
+
+.log-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  animation: calendarFadeIn 140ms ease-out;
+}
+
+.log-calendar-day {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px;
+}
+
+@media (max-width: 380px) {
+  .log-calendar {
+    padding: 10px;
+  }
+
+  .log-calendar-header {
+    padding: 4px 8px;
+    gap: 6px;
+  }
+
+  .log-calendar-grid {
+    gap: 4px;
+  }
+
+  .log-calendar-day {
+    min-width: 40px;
+    min-height: 44px;
+    padding: 4px;
+  }
+}

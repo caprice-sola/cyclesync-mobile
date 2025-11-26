@@ -2,6 +2,8 @@
 import React, { useMemo, useState } from "react";
 import { IonButton } from "@ionic/react";
 
+import "./LogCalendar.css";
+
 export type LogCalendarProps = {
   // We only care about date + phase here; other fields are ignored
   logs: { date: string; phase?: string }[];
@@ -199,72 +201,52 @@ export const LogCalendar: React.FC<LogCalendarProps> = ({
 
   return (
     <>
-      <div
-        style={{
-          marginBottom: 16,
-    padding: 14,
-    borderRadius: 16,
-    border: "1px solid rgba(148, 163, 184, 0.35)",
-    backgroundColor: "rgba(255,255,255,0.9)",
-    boxShadow: "0 10px 30px rgba(15,23,42,0.06)",
-        }}
-      >
+      <div className="log-calendar">
         {/* Month header */}
-      <div
-  style={{
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 10,
-    padding: "6px 10px",
-    borderRadius: 999,
-    background:
-      "linear-gradient(120deg, rgba(168,111,255,0.14), rgba(94,213,229,0.14))",
-  }}
->
-  <IonButton
-    size="small"
-    fill="clear"
-    color="primary"
-    className="tap-target"
-    onClick={() =>
-      setCalendarMonth((prev) => {
-        const m = prev.month === 0 ? 11 : prev.month - 1;
-        const y = prev.month === 0 ? prev.year - 1 : prev.year;
-        return { year: y, month: m };
-      })
-    }
-  >
-    ◀
-  </IonButton>
+      <div className="log-calendar-header">
+          <IonButton
+            size="small"
+            fill="clear"
+            color="primary"
+            className="tap-target"
+            onClick={() =>
+              setCalendarMonth((prev) => {
+                const m = prev.month === 0 ? 11 : prev.month - 1;
+                const y = prev.month === 0 ? prev.year - 1 : prev.year;
+                return { year: y, month: m };
+              })
+            }
+          >
+            ◀
+          </IonButton>
 
-  <div
-    style={{
-      fontWeight: 600,
-      fontSize: 14,
-      letterSpacing: 0.2,
-      color: "#0f172a",
-    }}
-  >
-    {monthLabel}
-  </div>
+          <div
+            style={{
+              fontWeight: 600,
+              fontSize: 14,
+              letterSpacing: 0.2,
+              color: "#0f172a",
+            }}
+          >
+            {monthLabel}
+          </div>
 
-  <IonButton
-    size="small"
-    fill="clear"
-    color="primary"
-    className="tap-target"
-    onClick={() =>
-      setCalendarMonth((prev) => {
-        const m = prev.month === 11 ? 0 : prev.month + 1;
-        const y = prev.month === 11 ? prev.year + 1 : prev.year;
-        return { year: y, month: m };
-      })
-    }
-  >
-    ▶
-  </IonButton>
-</div>
+          <IonButton
+            size="small"
+            fill="clear"
+            color="primary"
+            className="tap-target"
+            onClick={() =>
+              setCalendarMonth((prev) => {
+                const m = prev.month === 11 ? 0 : prev.month + 1;
+                const y = prev.month === 11 ? prev.year + 1 : prev.year;
+                return { year: y, month: m };
+              })
+            }
+          >
+            ▶
+          </IonButton>
+        </div>
 
 
         {/* Day names */}
@@ -290,13 +272,8 @@ export const LogCalendar: React.FC<LogCalendarProps> = ({
 
         {/* Grid */}
         <div
-  key={`${calendarMonth.year}-${calendarMonth.month}`}
-  style={{
-    display: "grid",
-    gridTemplateColumns: "repeat(7, 1fr)",
-    gap: 6,
-    animation: "calendarFadeIn 140ms ease-out",
-  }}
+          key={`${calendarMonth.year}-${calendarMonth.month}`}
+          className="log-calendar-grid"
 >
           {calendarWeeks.map((week, wi) =>
             week.map((cell, ci) => {
@@ -317,11 +294,8 @@ export const LogCalendar: React.FC<LogCalendarProps> = ({
                   key={cell.dateStr}
                   type="button"
                   onClick={() => onDayClick(cell.dateStr)}
-                  className="tap-target"
+                  className="tap-target log-calendar-day"
                   style={{
-  minHeight: 44,
-  minWidth: 44,
-  padding: 6,
   borderRadius: 999,
   border: isSelected
     ? "1px solid var(--ion-color-primary)"

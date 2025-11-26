@@ -117,3 +117,44 @@ ion-textarea {
     transform: translateY(0);
   }
 }
+
+/* Insights chart card */
+
+.insights-chart-card {
+  margin-top: 16px;
+}
+
+/* Give the chart a consistent, taller area */
+.insights-chart-container {
+  width: 100%;
+  height: 260px; /* tweak to taste: 240–280 works nicely on mobile */
+}
+
+/* Subtitle: slightly smaller + less space on small screens */
+.insights-chart-subtitle {
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+/* On very narrow phones, hide the subtitle to free up vertical space */
+@media (max-width: 360px) {
+  .insights-chart-subtitle {
+    display: none;
+  }
+}
+
+/* Make the chart card use more horizontal space */
+.insights-chart-content {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.insights-chart-controls {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 8px 8px;
+}
+
+.insights-chart-controls ion-select {
+  min-width: 160px;
+}

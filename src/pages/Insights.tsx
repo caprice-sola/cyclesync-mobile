@@ -10,8 +10,12 @@ import {
   IonLabel,
   IonText,
   IonBadge,
+  useIonViewWillEnter,
+  IonSelect,
+  IonSelectOption,
 } from "@ionic/react";
 
+import "./Insights.css";
 import { LogEntry } from "../utils/log";
 import {
   InsightsStats,
@@ -22,25 +26,74 @@ import { MetricsChart } from "../components/EnergyChart";
 import { loadLogs } from "../services/storage";
 import { PageLayout } from "../components/PageLayout";
 
+function monthKey(date: string | undefined): string | null {
+  if (!date) return null;
+  const parsed = new Date(date);
+  if (Number.isNaN(parsed.getTime())) return null;
+  const year = parsed.getFullYear();
+  const month = String(parsed.getMonth() + 1).padStart(2, "0");
+  return `${year}-${month}`;
+}
+
+function formatMonthLabel(key: string): string {
+  const [yearStr, monthStr] = key.split("-");
+  const year = Number(yearStr);
+  const month = Number(monthStr) - 1;
+  const d = new Date(year, month, 1);
+  if (Number.isNaN(d.getTime())) return key;
+  return d.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+}
+
 const Insights: React.FC = () => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
 
   // Load logs via storage service (shared with Logs tab)
-  useEffect(() => {
-    const initialLogs = loadLogs();
-    setLogs(initialLogs);
+  useIonViewWillEnter(() => {
+    const lastedLogs = loadLogs();
+    setLogs(lastedLogs);
     setLoaded(true);
-  }, []);
+  });
 
   const stats: InsightsStats = useMemo(
     () => buildInsightsStats(logs),
     [logs],
   );
 
+  const monthOptions = useMemo(() => {
+    const seen = new Map<string, string>();
+
+    for (const log of logs) {
+      const key = monthKey(log.date);
+      if (!key || seen.has(key)) continue;
+      seen.set(key, formatMonthLabel(key));
+    }
+
+    return Array.from(seen.entries())
+      .map(([key, label]) => ({ key, label }))
+      .sort((a, b) => b.key.localeCompare(a.key));
+  }, [logs]);
+
+  useEffect(() => {
+    if (!monthOptions.length) {
+      setSelectedMonth(null);
+      return;
+    }
+
+    if (!selectedMonth || !monthOptions.some((m) => m.key === selectedMonth)) {
+      setSelectedMonth(monthOptions[0].key);
+    }
+  }, [monthOptions, selectedMonth]);
+
+  const filteredLogs = useMemo(() => {
+    if (!selectedMonth) return logs;
+    return logs.filter((log) => monthKey(log.date) === selectedMonth);
+  }, [logs, selectedMonth]);
+
   const metricsSeries = useMemo(
-    () => buildMetricsSeries(logs),
-    [logs],
+    () => buildMetricsSeries(filteredLogs),
+    [filteredLogs],
   );
 
   const hasAnyData = logs.length > 0;
@@ -173,18 +226,36 @@ const Insights: React.FC = () => {
           </IonCard>
 
           {/* Metrics chart */}
-          <IonCard>
-            <IonCardHeader>
-              <IonCardTitle>Energy, RPE &amp; sleep over time</IonCardTitle>
-              <IonCardSubtitle>
-                See how intensity and recovery dance together across your
-                sessions.
-              </IonCardSubtitle>
-            </IonCardHeader>
-            <IonCardContent>
-              <MetricsChart data={metricsSeries} />
-            </IonCardContent>
-          </IonCard>
+          <IonCard className="insights-chart-card">
+  <IonCardHeader>
+    <IonCardTitle>Energy, RPE &amp; sleep over time</IonCardTitle>
+    <IonCardSubtitle className="insights-chart-subtitle">
+      See how intensity and recovery dance together across your
+      sessions.
+    </IonCardSubtitle>
+  </IonCardHeader>
+  <IonCardContent className="insights-chart-content">
+    <div className="insights-chart-controls">
+      <IonSelect
+        value={selectedMonth ?? undefined}
+        onIonChange={(e) => setSelectedMonth(e.detail.value ?? null)}
+        interface="popover"
+        label="Month"
+        aria-label="Select month"
+      >
+        {monthOptions.map((option) => (
+          <IonSelectOption key={option.key} value={option.key}>
+            {option.label}
+          </IonSelectOption>
+        ))}
+      </IonSelect>
+    </div>
+    <div className="insights-chart-container">
+      <MetricsChart data={metricsSeries} />
+    </div>
+  </IonCardContent>
+</IonCard>
+
 
           {/* By phase */}
           <IonCard>
