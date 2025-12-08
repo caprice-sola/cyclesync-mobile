@@ -1,11 +1,9 @@
-// src/components/log/LogCalendar.tsx
 import React, { useMemo, useState } from "react";
 import { IonButton } from "@ionic/react";
 
 import "./LogCalendar.css";
 
 export type LogCalendarProps = {
-  // We only care about date + phase here; other fields are ignored
   logs: { date: string; phase?: string }[];
   selectedDate: string;
   onDayClick: (dateStr: string) => void;
@@ -25,15 +23,17 @@ function toDateStringLocal(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
-// Phase → colour mapping for the dot under each day
-// const PHASE_COLORS: Record<string, string> = {
-//   Menstrual: "#f97373", // soft red
-//   Follicular: "#34d399", // green
-//   Ovulatory: "#facc15", // yellow
-//   Luteal: "#a78bfa", // purple
-//   mixed: "#64748b", // grey-ish for mixed days
-//   unlabeled: "#3b82f6", // default blue
-// };
+function formatAriaDate(dateStr: string): string | null {
+  if (!dateStr) return null;
+  const parsed = new Date(dateStr);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed.toLocaleDateString(undefined, {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
 
 function getPhaseKeyForDate(phaseValues: string[]): string {
   const cleaned = phaseValues
@@ -70,7 +70,6 @@ function getPhaseDotColor(phaseKey?: string): string {
   }
 }
 
-
 // Build the calendar grid plus phase info per day
 function buildCalendarMonth(
   year: number,
@@ -98,7 +97,6 @@ function buildCalendarMonth(
         phaseKey: phase || undefined,
       });
     } else {
-      // Update phaseKey to account for multiple entries in the same day
       const phasesForDate: string[] = [];
       if (existing.phaseKey) phasesForDate.push(existing.phaseKey);
       if (phase) phasesForDate.push(phase);
@@ -151,15 +149,7 @@ function buildCalendarMonth(
 
 function LegendDot({ color, label }: { color: string; label: string }) {
   return (
-    <span
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 4,
-        marginRight: 12,
-        marginBottom: 4,
-      }}
-    >
+    <li className="log-calendar-legend-item" role="listitem">
       <span
         style={{
           width: 8,
@@ -169,7 +159,7 @@ function LegendDot({ color, label }: { color: string; label: string }) {
         }}
       />
       <span>{label}</span>
-    </span>
+    </li>
   );
 }
 
@@ -190,6 +180,89 @@ export const LogCalendar: React.FC<LogCalendarProps> = ({
     [calendarMonth, logs],
   );
 
+  const focusDayButton = (dateStr: string) => {
+    const el = document.querySelector<HTMLButtonElement>(
+      `button.log-calendar-day[data-date="${dateStr}"]`,
+    );
+    el?.focus();
+  };
+
+  const focusNextHorizontal = (
+    startRow: number,
+    startCol: number,
+    step: 1 | -1,
+  ) => {
+    const maxCells = calendarWeeks.length * 7;
+    let row = startRow;
+    let col = startCol;
+
+    for (let i = 0; i < maxCells; i += 1) {
+      col += step;
+      if (col > 6) {
+        row += 1;
+        col = 0;
+      } else if (col < 0) {
+        row -= 1;
+        col = 6;
+      }
+
+      if (row < 0 || row >= calendarWeeks.length) return;
+      const cell = calendarWeeks[row]?.[col];
+      if (!cell || !cell.day) continue;
+      focusDayButton(cell.dateStr);
+      return;
+    }
+  };
+
+  const focusNextVertical = (
+    startRow: number,
+    startCol: number,
+    step: 1 | -1,
+  ) => {
+    let row = startRow + step;
+    while (row >= 0 && row < calendarWeeks.length) {
+      const cell = calendarWeeks[row]?.[startCol];
+      if (cell && cell.day) {
+        focusDayButton(cell.dateStr);
+        return;
+      }
+      row += step;
+    }
+  };
+
+  const handleDayKeyDown = (
+    event: React.KeyboardEvent<HTMLButtonElement>,
+    row: number,
+    col: number,
+    dateStr: string,
+  ) => {
+    switch (event.key) {
+      case "ArrowLeft":
+        event.preventDefault();
+        focusNextHorizontal(row, col, -1);
+        break;
+      case "ArrowRight":
+        event.preventDefault();
+        focusNextHorizontal(row, col, 1);
+        break;
+      case "ArrowUp":
+        event.preventDefault();
+        focusNextVertical(row, col, -1);
+        break;
+      case "ArrowDown":
+        event.preventDefault();
+        focusNextVertical(row, col, 1);
+        break;
+      case "Enter":
+      case " ":
+        event.preventDefault();
+        onDayClick(dateStr);
+        break;
+      default:
+        break;
+    }
+  };
+
   const monthLabel = useMemo(
     () =>
       new Date(calendarMonth.year, calendarMonth.month, 1).toLocaleDateString(
@@ -198,17 +271,21 @@ export const LogCalendar: React.FC<LogCalendarProps> = ({
       ),
     [calendarMonth],
   );
+  const monthHeadingId = `log-calendar-month-${calendarMonth.year}-${calendarMonth.month}`;
 
   return (
     <>
-      <div className="log-calendar">
+      <div className="log-calendar" role="group" aria-labelledby={monthHeadingId}>
         {/* Month header */}
-      <div className="log-calendar-header">
+        <div className="log-calendar-header">
           <IonButton
             size="small"
             fill="clear"
             color="primary"
             className="tap-target"
+            aria-label="Previous month"
+            type="button"
+            tabIndex={0}
             onClick={() =>
               setCalendarMonth((prev) => {
                 const m = prev.month === 0 ? 11 : prev.month - 1;
@@ -220,22 +297,26 @@ export const LogCalendar: React.FC<LogCalendarProps> = ({
             ◀
           </IonButton>
 
-          <div
-            style={{
-              fontWeight: 600,
-              fontSize: 14,
-              letterSpacing: 0.2,
-              color: "#0f172a",
-            }}
+          <h2
+            className="log-calendar-month"
+            aria-live="polite"
+            aria-atomic="true"
+            role="status"
+            tabIndex={-1}
+            id={monthHeadingId}
+            aria-label={`Month ${monthLabel}`}
           >
             {monthLabel}
-          </div>
+          </h2>
 
           <IonButton
             size="small"
             fill="clear"
             color="primary"
             className="tap-target"
+            aria-label="Next month"
+            type="button"
+            tabIndex={0}
             onClick={() =>
               setCalendarMonth((prev) => {
                 const m = prev.month === 11 ? 0 : prev.month + 1;
@@ -247,7 +328,6 @@ export const LogCalendar: React.FC<LogCalendarProps> = ({
             ▶
           </IonButton>
         </div>
-
 
         {/* Day names */}
         <div
@@ -274,13 +354,14 @@ export const LogCalendar: React.FC<LogCalendarProps> = ({
         <div
           key={`${calendarMonth.year}-${calendarMonth.month}`}
           className="log-calendar-grid"
->
+        >
           {calendarWeeks.map((week, wi) =>
             week.map((cell, ci) => {
               if (!cell.day) {
                 return (
                   <div
                     key={`${wi}-${ci}`}
+                    aria-hidden="true"
                     style={{ height: 32 }}
                   />
                 );
@@ -288,6 +369,23 @@ export const LogCalendar: React.FC<LogCalendarProps> = ({
 
               const isSelected = cell.dateStr === selectedDate;
               const isToday = cell.dateStr === todayStr;
+              const ariaDate = formatAriaDate(cell.dateStr) ?? cell.dateStr;
+
+              // Human-friendly phase phrase
+              let phasePhrase = "";
+              if (cell.hasLog) {
+                if (cell.phaseKey === "unlabeled" || !cell.phaseKey) {
+                  phasePhrase = "No phase label set.";
+                } else if (cell.phaseKey === "mixed") {
+                  phasePhrase = "Mixed phases across entries.";
+                } else {
+                  phasePhrase = `Phase ${cell.phaseKey}.`;
+                }
+              }
+
+              const ariaLabel = cell.hasLog
+                ? `Log for ${ariaDate}. ${phasePhrase} Double-tap to edit log.`
+                : `No log for ${ariaDate}. Double-tap to add log.`;
 
               return (
                 <button
@@ -295,38 +393,50 @@ export const LogCalendar: React.FC<LogCalendarProps> = ({
                   type="button"
                   onClick={() => onDayClick(cell.dateStr)}
                   className="tap-target log-calendar-day"
+                  onKeyDown={(e) =>
+                    handleDayKeyDown(e, wi, ci, cell.dateStr)
+                  }
+                  data-date={cell.dateStr}
+                  data-row={wi}
+                  data-col={ci}
+                  aria-label={ariaLabel}
+                  aria-pressed={isSelected}
+                  aria-current={isToday ? "date" : undefined}
                   style={{
-  borderRadius: 999,
-  border: isSelected
-    ? "1px solid var(--ion-color-primary)"
-    : isToday
-    ? "1px solid rgba(168,111,255,0.7)"
-    : "1px solid rgba(148,163,184,0.35)",
-  backgroundColor: isSelected
-    ? "var(--ion-color-primary)"
-    : isToday
-    ? "rgba(168,111,255,0.08)"
-    : "transparent",
-  color: isSelected ? "#ffffff" : "inherit",
-  fontSize: 12,
-  fontWeight: isSelected || isToday ? 600 : 400,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  boxShadow: isSelected
-    ? "0 0 0 1px rgba(255,255,255,0.4), 0 6px 14px rgba(15,23,42,0.18)"
-    : "none",
-  transform: isSelected ? "scale(1.05)" : "scale(1)",
-  transition:
-    "background-color 120ms ease, color 120ms ease, transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease",
-}}
-
+                    borderRadius: 999,
+                    border: isSelected
+                      ? "1px solid var(--ion-color-primary)"
+                      : isToday
+                      ? "1px solid rgba(168,111,255,0.7)"
+                      : "1px solid rgba(148,163,184,0.35)",
+                    backgroundColor: isSelected
+                      ? "var(--ion-color-primary)"
+                      : isToday
+                      ? "rgba(168,111,255,0.08)"
+                      : "transparent",
+                    color: isSelected ? "#ffffff" : "inherit",
+                    fontSize: 12,
+                    fontWeight: isSelected || isToday ? 600 : 400,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: isSelected
+                      ? "0 0 0 1px rgba(255,255,255,0.4), 0 6px 14px rgba(15,23,42,0.18)"
+                      : "none",
+                    transform: isSelected ? "scale(1.05)" : "scale(1)",
+                    transition:
+                      "background-color 120ms ease, color 120ms ease, transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease",
+                  }}
                 >
-                  <span style={{
-    lineHeight: 1.1,
-    marginBottom: cell.hasLog ? 0 : 1,
-  }}>{cell.day}</span>
+                  <span
+                    style={{
+                      lineHeight: 1.1,
+                      marginBottom: cell.hasLog ? 0 : 1,
+                    }}
+                  >
+                    {cell.day}
+                  </span>
                   {cell.hasLog && (
                     <span
                       style={{
@@ -348,23 +458,14 @@ export const LogCalendar: React.FC<LogCalendarProps> = ({
       </div>
 
       {/* Phase legend */}
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        alignItems: "center",
-        fontSize: 11,
-        opacity: 0.8,
-        marginBottom: 8,
-      }}
-    >
-      <LegendDot color="var(--phase-menstrual)" label="Menstrual" />
-      <LegendDot color="var(--phase-follicular)" label="Follicular" />
-      <LegendDot color="var(--phase-ovulatory)" label="Ovulatory" />
-      <LegendDot color="var(--phase-luteal)" label="Luteal" />
-      <LegendDot color="var(--phase-custom)" label="Custom / other" />
-      <LegendDot color="rgba(148,163,184,0.8)" label="Unlabeled" />
-    </div>
+      <ul className="log-calendar-legend" role="list">
+        <LegendDot color="var(--phase-menstrual)" label="Menstrual" />
+        <LegendDot color="var(--phase-follicular)" label="Follicular" />
+        <LegendDot color="var(--phase-ovulatory)" label="Ovulatory" />
+        <LegendDot color="var(--phase-luteal)" label="Luteal" />
+        <LegendDot color="var(--phase-custom)" label="Custom / other" />
+        <LegendDot color="rgba(148,163,184,0.8)" label="Unlabeled" />
+      </ul>
 
       <p
         style={{

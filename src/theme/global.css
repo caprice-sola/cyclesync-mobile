@@ -158,3 +158,25 @@ ion-textarea {
 .insights-chart-controls ion-select {
   min-width: 160px;
 }
+
+/* Screen-reader only utility */
+.sr-only {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.page-title-centered {
+  text-align: center !important;
+  width: 100%;
+}
+
+ion-title.page-title-centered::part(title) {
+  justify-content: center;
+  text-align: center;
+}

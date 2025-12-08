@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 import {
   IonPage,
   IonHeader,
@@ -38,6 +38,14 @@ type PageLayoutProps = {
    * Toggle IonContent fullscreen to drop default padding when a screen needs full bleed.
    */
   fullscreen?: boolean;
+  /**
+   * Optional id to attach to the page title for accessibility.
+   */
+  titleId?: string;
+  /**
+   * Optional custom id to use for aria-labelledby (e.g. to point to a screen-reader-only heading).
+   */
+  ariaLabelledById?: string;
 };
 
 /**
@@ -54,19 +62,35 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
   toolbarEnd,
   pageId,
   fullscreen = false,
+  titleId,
+  ariaLabelledById,
 }) => {
+  const generatedTitleId = useId();
+  const resolvedTitleId = titleId ?? (pageId ? `${pageId}-title` : generatedTitleId);
+  const labelledById = ariaLabelledById ?? resolvedTitleId;
   return (
-    <IonPage id={pageId}>
+    <IonPage id={pageId} aria-labelledby={labelledById}>
       <IonHeader>
         <IonToolbar>
           {toolbarStart && <IonButtons slot="start">{toolbarStart}</IonButtons>}
-          <IonTitle>{title}</IonTitle>
+          <IonTitle
+            id={resolvedTitleId}
+            role="heading"
+            aria-level={1}
+            className="page-title-centered"
+          >
+            {title}
+          </IonTitle>
           {toolbarEnd && <IonButtons slot="end">{toolbarEnd}</IonButtons>}
           {headerSlot}
         </IonToolbar>
       </IonHeader>
 
-      <IonContent className={contentClassName} fullscreen={fullscreen}>
+      <IonContent
+        className={contentClassName}
+        fullscreen={fullscreen}
+        aria-labelledby={labelledById}
+      >
         {loading ? <IonText>{loadingText}</IonText> : children}
       </IonContent>
     </IonPage>

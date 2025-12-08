@@ -1,4 +1,3 @@
-// src/components/log/DayLogModal.tsx
 import React from "react";
 import {
   IonModal,
@@ -7,9 +6,6 @@ import {
   IonTitle,
   IonButton,
   IonContent,
-  //IonText,
-  IonList,
-  IonItem,
 } from "@ionic/react";
 import { DayLogEntryCard } from "./DayLogEntryCard";
 
@@ -50,17 +46,36 @@ export const DayLogModal: React.FC<DayLogModalProps> = ({
   parseNullableNumber,
 }) => {
   const hasDate = !!selectedDate;
+  const hasEntries = hasDate && entries.length > 0;
 
-  const title = hasDate
-    ? formatDisplayDate(selectedDate)
-    : "Day log";
+  const displayDate = hasDate ? formatDisplayDate(selectedDate) : "";
+  const title = hasDate ? displayDate : "Day log";
+
+  const titleId = "day-log-modal-title";
+  const summaryId =
+    hasDate && entries.length > 0
+      ? `day-log-summary-${selectedDate}`
+      : undefined;
+
+  const describedBy = hasEntries ? summaryId : undefined;
 
   return (
-    <IonModal isOpen={isOpen} onDidDismiss={onClose}>
+    <IonModal
+      isOpen={isOpen}
+      onDidDismiss={onClose}
+      aria-labelledby={titleId}
+      aria-describedby={describedBy}
+    >
       <IonHeader>
         <IonToolbar>
-          <IonTitle>{title}</IonTitle>
-          <IonButton slot="end" fill="clear" onClick={onClose}>
+          <IonTitle id={titleId}>{title}</IonTitle>
+          <IonButton
+            slot="end"
+            fill="clear"
+            onClick={onClose}
+            aria-label="Close day log"
+            type="button"
+          >
             Close
           </IonButton>
         </IonToolbar>
@@ -77,42 +92,51 @@ export const DayLogModal: React.FC<DayLogModalProps> = ({
         ) : entries.length === 0 ? (
           <div className="day-modal-empty">
             <p>
-              No entries yet for{" "}
-              <strong>{formatDisplayDate(selectedDate)}</strong>.
+              No entries yet for <strong>{displayDate}</strong>.
             </p>
             <div className="day-modal-actions">
-              <IonButton expand="block" onClick={onAddEntryForDay}>
+              <IonButton
+                expand="block"
+                onClick={onAddEntryForDay}
+                aria-label={`Add log for ${displayDate}`}
+                type="button"
+              >
                 Add entry for this day
               </IonButton>
             </div>
           </div>
         ) : (
           <>
-            <p className="day-modal-summary">
+            <p
+              className="day-modal-summary"
+              id={summaryId}
+              aria-live="polite"
+            >
               You have <strong>{entries.length}</strong>{" "}
               entr{entries.length === 1 ? "y" : "ies"} for{" "}
-              <strong>{formatDisplayDate(selectedDate)}</strong>.
+              <strong>{displayDate}</strong>.
             </p>
 
-            <IonList className="day-modal-list">
-              {entries.map((entry, index) => (
-                <IonItem key={entry.id} lines="none">
-                  <DayLogEntryCard
-                    index={index}
-                    entry={entry}
-                    onUpdateEntry={onUpdateEntry}
-                    onDeleteEntry={onDeleteEntry}
-                    parseNullableNumber={parseNullableNumber}
-                  />
-                </IonItem>
-              ))}
-            </IonList>
+            <div className="day-modal-list" role="list">
+  {entries.map((entry, index) => (
+    <section
+      key={entry.id}
+      role="listitem"
+      className="day-modal-list-item"
+    >
+      <DayLogEntryCard
+        index={index}
+        entry={entry}
+        onUpdateEntry={onUpdateEntry}
+        onDeleteEntry={onDeleteEntry}
+        parseNullableNumber={parseNullableNumber}
+      />
+    </section>
+  ))}
+</div>
 
-            <div className="day-modal-actions">
-              <IonButton expand="block" onClick={onAddEntryForDay}>
-                Add another entry for this day
-              </IonButton>
-            </div>
+
+            {/* Intentionally disabling multiple entries per day for now */}
           </>
         )}
       </IonContent>

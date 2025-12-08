@@ -154,7 +154,14 @@ const Logs: React.FC = () => {
   };
 
   return (
-    <PageLayout title="Log" loading={!loaded} loadingText="Loading…">
+    <PageLayout
+      title="Log"
+      pageId="logs-page"
+      titleId="logs-page-title"
+      ariaLabelledById="logs-page-sr-heading"
+      loading={!loaded}
+      loadingText="Loading…"
+    >
       {/* Calendar */}
       <LogCalendar
         logs={logs}

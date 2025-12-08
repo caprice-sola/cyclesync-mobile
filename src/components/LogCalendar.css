@@ -27,6 +27,7 @@
   font-size: 14px;
   letter-spacing: 0.2px;
   color: #0f172a;
+  margin: 0;
 }
 
 .log-calendar-grid {
@@ -40,6 +41,36 @@
   min-width: 44px;
   min-height: 44px;
   padding: 6px;
+}
+
+.log-calendar-day:focus-visible {
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: 2px;
+}
+
+.log-calendar-instructions {
+  font-size: 12px;
+  opacity: 0.8;
+  margin: 0 0 8px;
+}
+
+.log-calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: 11px;
+  opacity: 0.8;
+  margin: 8px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.log-calendar-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 12px;
+  margin-bottom: 4px;
 }
 
 @media (max-width: 380px) {
