@@ -12,13 +12,17 @@ import {
 import type { CSSProperties } from "react";
 
 import { PlanState, WeekPlan, getMondayLocal } from "../utils/log";
+
 import {
   DAYS,
   STORAGE_KEY_PLAN_V2,
   LEGACY_KEY_PLAN_V1,
   createWeek,
 } from "../utils/plan";
+
 import { PageLayout } from "../components/PageLayout";
+
+import { warn } from "../utils/logging";
 
 const weekSelectorStyle: CSSProperties & {
   "--inner-padding-end"?: string;
@@ -83,7 +87,7 @@ const Plan: React.FC = () => {
       setCurrentWeekStart(todayMonday);
       setLoaded(true);
     } catch (e) {
-      console.warn("Failed to load plan", e);
+      warn("Failed to load plan", e);
       const fallbackWeek = createWeek(todayMonday);
       setWeeks([fallbackWeek]);
       setCurrentWeekStart(todayMonday);
@@ -98,7 +102,7 @@ const Plan: React.FC = () => {
     try {
       localStorage.setItem(STORAGE_KEY_PLAN_V2, JSON.stringify(state));
     } catch (e) {
-      console.warn("Failed to save plan", e);
+      warn("Failed to save plan", e);
     }
   }, [weeks, loaded]);
 

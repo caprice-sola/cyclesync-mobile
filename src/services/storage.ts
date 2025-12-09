@@ -6,6 +6,8 @@
 
 import { LogEntry } from "../utils/log";
 
+import { warn } from "../utils/logging";
+
 const STORAGE_KEY_LOGS = "cyclesync_mobile_logs_v1";
 
 // --- Helpers ---------------------------------------------------
@@ -49,7 +51,7 @@ export function loadLogs(): LogEntry[] {
     if (!Array.isArray(parsed)) return [];
     return parsed.map((item) => normaliseLogEntry(item as Partial<LogEntry>));
   } catch (e) {
-    console.warn("[storage] Failed to load logs", e);
+    warn("[storage] Failed to load logs", e);
     return [];
   }
 }
@@ -62,6 +64,6 @@ export function saveLogs(logs: LogEntry[]): void {
     const payload = JSON.stringify(logs);
     window.localStorage.setItem(STORAGE_KEY_LOGS, payload);
   } catch (e) {
-    console.warn("[storage] Failed to save logs", e);
+    warn("[storage] Failed to save logs", e);
   }
 }

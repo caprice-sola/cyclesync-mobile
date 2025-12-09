@@ -21,6 +21,9 @@ import {
   STORAGE_KEY_PLAN_V2,
 } from "../utils/plan";
 
+import { warn } from "../utils/logging";
+
+
 //const STORAGE_KEY_PLAN_V2 = "cyclesync_mobile_plan_v2";
 const LEGACY_KEY_PLAN_V1 = "cyclesync_mobile_plan_v1";
 
@@ -84,7 +87,7 @@ const Logs: React.FC = () => {
         setPlanState({ weeks: [single] });
       }
     } catch (e) {
-      console.warn("Failed to load plan for log suggestions", e);
+      warn("Failed to load plan for log suggestions", e);
     }
   }, []);
 
