@@ -4,6 +4,7 @@
 // swap this out for secure storage / backend without
 // touching the rest of the app.
 
+/* eslint-disable no-console */
 import { LogEntry } from "../utils/log";
 
 import { warn } from "../utils/logging";
